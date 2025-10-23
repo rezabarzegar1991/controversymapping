@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- New Palette: Main: 6c4675 | Text: 2b303a | Proponent: 48acf0 | Opponent: e54f6d -->
+    <!-- New Palette: Main: 6c4675 | Text: 2b303a | Background: f7f7ff | Proponent: 48acf0 | Opponent: e54f6d -->
     <style>
         :root {
             --color-main: #6c4675;
@@ -70,17 +70,22 @@
         .debate-card.active-ring[data-actor="developers"] {
             box-shadow: 0 0 0 3px rgba(72, 172, 240, 0.5); /* Proponent */
         }
-        .debate-card.active-ring[data-actor="ran"] {
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5); /* Green (RAN is still neutral/green) */
-        }
+        /* FIX: Use --color-main for pivot elements (RAN and Applicants) for cohesion */
+        .debate-card.active-ring[data-actor="ran"],
         .debate-card.active-ring[data-actor="applicants"] {
-            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.7); /* Yellow (Pivot) */
+             box-shadow: 0 0 0 3px rgba(108, 70, 117, 0.45); /* Main theme accent */
+        }
+        /* Custom class for the RAN tag background contrast fix */
+        .bg-ran-tag {
+             background-color: rgba(108, 70, 117, 0.2); /* Lighter tint of main color */
+             color: var(--color-main); /* Strong main color text */
         }
         /* Timeline styles for Chapter 4 */
         .resistance-timeline {
             position: relative;
             padding-top: 2rem;
         }
+        /* FIX: Line color derived from CSS variable */
         .resistance-timeline .line {
             position: absolute;
             left: 1rem;
@@ -91,27 +96,15 @@
             opacity: 0.4;
             border-radius: 2px;
         }
+        /* Removed .resistance-step and .number-circle styles to rely on JS-generated Tailwind structure for symmetry */
+        /* If defining them here, they need to be minimal: */
         .resistance-step {
             display: flex;
             align-items: flex-start;
             margin-bottom: 2rem;
             position: relative;
         }
-        .resistance-step .number-circle {
-            width: 2rem;
-            height: 2rem;
-            background-color: var(--color-opponent); 
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-            z-index: 10;
-            margin-left: -0.25rem;
-            box-shadow: 0 0 0 4px rgba(229, 79, 109, 0.4);
-        }
+        
         /* Styling for the Proponent Timeline */
         #prop-timeline .number-circle { 
             background-color: var(--color-proponent); 
@@ -157,10 +150,11 @@
         <!-- Main Content Area -->
         <main class="lg:ml-[20%] w-full lg:w-[80%] px-6 md:px-12 py-10 pt-8">
 
-            <!-- Language and Info Bar (Now Scrollable) -->
+            <!-- Language and Info Bar (Now Scrollable and NOT Fixed) -->
             <div class="flex justify-between items-center max-w-7xl mx-auto mb-8">
                 <h1 class="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider" data-i18n="headerTitle">Disputa de Terrenos RAN em Oeiras (STS MIRS)</h1>
                 <div class="flex items-center space-x-4">
+                    <!-- Language Toggles are here, necessary for JS init -->
                     <button id="lang-toggle-pt" class="text-xs font-semibold px-2 py-1 rounded-full border transition" style="border-color: var(--color-main);" >PT</button>
                     <button id="lang-toggle-en" class="text-xs font-medium px-2 py-1 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">EN</button>
                     <a href="#footer" class="hidden sm:block text-xs font-medium text-[var(--color-main)] hover:opacity-70 transition" data-i18n="aboutLink">Sobre o Projeto / Equipa & Ética »</a>
@@ -176,11 +170,12 @@
                     <p class="text-xl text-gray-600 mb-12" data-i18n="ch1_intro">
                         Está a explorar um ponto crítico em Oeiras: o plano de construir 1.500 unidades de habitação social em terrenos da <strong>Reserva Agrícola Nacional (RAN)</strong>. Este é um profundo <strong>compromisso político e moral</strong> entre a <strong>necessidade social urgente</strong> de famílias vulneráveis e a <strong>perda ecológica irreversível</strong> de solo fértil não renovável na Quinta do Sobreiro.
                     </p>
-                    <!-- FIX: Consistent alignment via flex-wrap and gap-4 -->
+                    <!-- FIX: Consistent alignment via flex-wrap and gap-4. RAN color uses new contrast class. -->
                     <div class="flex flex-wrap items-center gap-4 mb-12">
                         <span class="px-4 py-2 bg-[var(--color-opponent)]/10 text-[var(--color-opponent)] rounded-full font-medium">#ImperativoEcológico</span>
                         <span class="px-4 py-2 bg-[var(--color-proponent)]/10 text-[var(--color-proponent)] rounded-full font-medium">#NecessidadeSocial</span>
-                        <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full font-medium">#TerrenoRAN</span>
+                        <!-- FIX: Use new contrast class -->
+                        <span class="px-4 py-2 rounded-full font-medium bg-ran-tag">#TerrenoRAN</span>
                     </div>
 
                     <!-- HOUSING BURDEN & CORE ISSUES -->
@@ -471,20 +466,20 @@
         // --- BILINGUAL DATA STORE (PT/EN) ---
         const researchSources = [
             // PRO PONENT (CMO/Social Necessity) - 6 ITEMS
-            { id: 'p1', side: 'proponent', title: { pt: "Oeiras vai investir 400 milhões em Habitação: Prioridade PRR", en: "Oeiras to invest 400 million in Housing: PRR Priority" }, summary: { pt: "Declaração municipal confirmando o investimento de €400M e o mandato político urgente para cumprir os prazos de entrega do PRR, justificando a necessidade de rapidez e medidas excecionais.", en: "Municipal declaration confirming the €400M investment and the urgent political mandate to meet PRR delivery timelines, justifying the need for speed and exceptional measures." }, link: "#" },
-            { id: 'p2', side: 'proponent', title: { pt: "Presidente Morais: 'A Lei dos Solos gerou inflação e crise'", en: "Mayor Morais: 'The Land Law generated inflation and crisis'" }, summary: { pt: 'Argumento central do Presidente Isaltino Morais: A Lei dos Solos de 2014 criou escassez artificial, impulsionando a hiperinflação e tornando o terreno urbano inacessível.', en: "Mayor Isaltino Morais's central argument: The 2014 national Land Law created an artificial land scarcity, driving hyper-inflation and making urban land unaffordable." }, link: "#" },
-            { id: 'p3', side: 'proponent', title: { pt: "Decreto-Lei n.º 117/2024: Conversão de Solos Rústicos", en: "Decreto-Lei n.º 117/2024: Rustic Land Conversion" }, summary: { pt: 'A chave legal para permitir a conversão de terrenos rústicos para habitação pública urgente, dando à CMO a alavanca legal necessária para contornar as restrições da RAN.', en: "The key legal mechanism allowing rustic land conversion for urgent public housing, providing the CMO with the necessary legal lever to attempt to bypass RAN restrictions." }, link: "#" },
-            { id: 'p4', side: 'proponent', title: { pt: "Despacho 3194/2025: Coordenação Ministerial e Responsabilidade", en: "Despacho 3194/2025: Ministerial Coordination and Responsibility" }, summary: { pt: 'Despacho ministerial que centraliza a responsabilidade legal e a tomada de decisões a nível nacional, protegendo o executivo de Oeiras de atrasos judiciais locais.', en: "Ministerial dispatch that centralizes legal responsibility and decision-making at the national level, insulating the Oeiras executive from local judicial delays." }, link: "#" },
-            { id: 'p5', side: 'proponent', title: { pt: "Oeiras Valorização Económica: Taxas de Crescimento e Projeções", en: "Oeiras Economic Valuation: Growth Rates and Projections" }, summary: { pt: "Relatórios oficiais destacando a alta taxa de crescimento económico do município (Oeiras Valley), apresentada como a causa raiz da demanda por habitação e da inflação de preços.", en: "Official reports highlighting the municipality's high economic growth rate (Oeiras Valley), presented as the root cause of the housing demand and price inflation." }, link: "#" },
-            { id: 'p6', side: 'proponent', title: { pt: "Comunicação: S. Marçal II como Precedente de Utilidade Pública", en: "Communication: S. Marçal II as Public Utility Precedent" }, summary: { pt: "Comunicação municipal citando o projeto S. Marçal II como precedente para declarar utilidade pública essencial e acelerar a construção em locais controversos.", en: "Municipal communication citing the S. Marçal II project as precedent for declaring essential public utility to expedite construction on controversial sites." }, link: "#" },
+            { id: 'p1', side: 'proponent', title: { pt: "Oeiras vai investir 400 milhões em Habitação: Prioridade PRR", en: "Oeiras to invest 400 million in Housing: PRR Priority" }, summary: { pt: "Declaração municipal confirmando o investimento de €400M e o mandato político urgente para cumprir os prazos de entrega do PRR, justificando a necessidade de rapidez e medidas excecionais.", en: "Municipal declaration confirming the €400M investment and the urgent political mandate to meet PRR delivery timelines, justifying the need for speed and exceptional measures." }, link: "https://www.google.com/search?q=Oeiras+400+milhões+habitação+PRR" },
+            { id: 'p2', side: 'proponent', title: { pt: "Presidente Morais: 'A Lei dos Solos gerou inflação e crise'", en: "Mayor Morais: 'The Land Law generated inflation and crisis'" }, summary: { pt: 'Argumento central do Presidente Isaltino Morais: A Lei dos Solos de 2014 criou escassez artificial, impulsionando a hiperinflação e tornando o terreno urbano inacessível.', en: "Mayor Isaltino Morais's central argument: The 2014 national Land Law created an artificial land scarcity, driving hyper-inflation and making urban land unaffordable." }, link: "https://www.google.com/search?q=Isaltino+Morais+Lei+dos+Solos+2014+inflação" },
+            { id: 'p3', side: 'proponent', title: { pt: "Decreto-Lei n.º 117/2024: Conversão de Solos Rústicos", en: "Decreto-Lei n.º 117/2024: Rustic Land Conversion" }, summary: { pt: 'A chave legal para permitir a conversão de terrenos rústicos para habitação pública urgente, dando à CMO a alavanca legal necessária para contornar as restrições da RAN.', en: "The key legal mechanism allowing rustic land conversion for urgent public housing, providing the CMO with the necessary legal lever to attempt to bypass RAN restrictions." }, link: "https://www.google.com/search?q=Decreto-Lei+117%2F2024+terrenos+rústicos+Oeiras" },
+            { id: 'p4', side: 'proponent', title: { pt: "Despacho 3194/2025: Coordenação Ministerial e Responsabilidade", en: "Despacho 3194/2025: Ministerial Coordination and Responsibility" }, summary: { pt: 'Despacho ministerial que centraliza a responsabilidade legal e a tomada de decisões a nível nacional, protegendo o executivo de Oeiras de atrasos judiciais locais.', en: "Ministerial dispatch that centralizes legal responsibility and decision-making at the national level, insulating the Oeiras executive from local judicial delays." }, link: "https://www.google.com/search?q=Despacho+3194%2F2025+Oeiras" },
+            { id: 'p5', side: 'proponent', title: { pt: "Oeiras Valorização Económica: Taxas de Crescimento e Projeções", en: "Oeiras Economic Valuation: Growth Rates and Projections" }, summary: { pt: "Relatórios oficiais destacando a alta taxa de crescimento económico do município (Oeiras Valley), apresentada como a causa raiz da demanda por habitação e da inflação de preços.", en: "Official reports highlighting the municipality's high economic growth rate (Oeiras Valley), presented as the root cause of the housing demand and price inflation." }, link: "https://www.google.com/search?q=Oeiras+Valorização+Económica+Relatórios" },
+            { id: 'p6', side: 'proponent', title: { pt: "Comunicação: S. Marçal II como Precedente de Utilidade Pública", en: "Communication: S. Marçal II as Public Utility Precedent" }, summary: { pt: "Comunicação municipal citando o projeto S. Marçal II como precedente para declarar utilidade pública essencial e acelerar a construção em locais controversos.", en: "Municipal communication citing the S. Marçal II project as precedent for declaring essential public utility to expedite construction on controversial sites." }, link: "https://www.google.com/search?q=Oeiras+S.+Marçal+II+Utilidade+Pública" },
 
-            // OPPONENT (Coalition/Ecological Imperative) - 6 ITEMS
-            { id: 'o1', side: 'opponent', title: { pt: "Manifesto pela Reserva Agrícola Nacional (Quercus, ZERO, LPN)", en: "Manifesto for the National Agricultural Reserve (Quercus, ZERO, LPN)" }, summary: { pt: "Declaração conjunta de grandes ONGs nacionais exigindo a preservação rigorosa da RAN e rejeitando o modelo expansionista em favor da regeneração urbana sustentável.", en: "Joint statement from major national NGOs demanding strict RAN preservation and rejecting the expansionist model in favor of sustainable urban regeneration." }, link: "#" },
-            { id: 'o2', side: 'opponent', title: { pt: "Evoluir Oeiras: O Paradoxo dos 7.000 Imóveis Devolutos", en: "Evoluir Oeiras: The Paradox of 7,000 Vacant Properties" }, summary: { pt: "Alegação ativista local que desafia a premissa central da CMO citando mais de 7.000 imóveis devolutos, argumentando que a crise pode ser resolvida através da reabilitação.", en: "Local activist claim challenging the CMO's core premise by citing an estimated 7,000+ vacant properties, arguing the crisis can be solved through rehabilitation." }, link: "#" },
-            { id: 'o3', side: 'opponent', title: { pt: "Parecer CNADS sobre Risco de Desregulação no Planeamento Urbano", en: "CNADS Opinion on Risk of Urban Planning Deregulation" }, summary: { pt: "Parecer de organismos nacionais de planeamento contestando a premissa da CMO, alertando para o perigoso precedente político de 'desregulamentação'.", en: "National planning advisory body opinion opposing the municipal move, warning of the dangerous political precedent of 'deregulation' set by overriding RAN status." }, link: "#" },
-            { id: 'o4', side: 'opponent', title: { pt: "Análise Ecológica: RAN Solo Classe A/B e Imunidade Legal", en: "Ecological Analysis: RAN Class A/B Soil and Legal Immunity" }, summary: { pt: "Análise especializada confirmando que o terreno em questão é solo agrícola de alta aptidão, o que, sob a lei existente, deve conferir o mais alto nível de imunidade legal contra a construção.", en: "Expert analysis confirming that the land in question is highly-aptitude agricultural soil, which, under existing law, should confer the highest level of non-negotiable legal immunity against construction." }, link: "#" },
-            { id: 'o5', side: 'opponent', title: { pt: "Estudo de Impacto Climático e Perda de Sumidouros de Carbono", en: "Climate Impact Study and Loss of Carbon Sinks" }, summary: { pt: "Investigação alertando que a perda permanente de espaços verdes e solo fértil compromete significativamente a adaptação climática de longo prazo de Oeiras e a capacidade de absorção de carbono.", en: "Research warning that the permanent loss of green spaces and fertile soil significantly compromises Oeiras's long-term climate adaptation and carbon absorption capacity." }, link: "#" },
-            { id: 'o6', side: 'opponent', title: { pt: "Reportagem: Pressão Imobiliária e o Destino dos Terrenos Rústicos", en: "Report: Real Estate Pressure and the Fate of Rustic Land" }, summary: { pt: "Jornalismo de investigação destacando a crescente pressão financeira e política exercida pelo setor imobiliário para desclassificar terrenos protegidos perto de centros urbanos.", en: "Investigative journalism highlighting the increasing financial and political pressure exerted by the real estate sector to declassify protected land near urban centers." }, link: "#" },
+            // OPPONENT (Coalition/Ecological Imperative)
+            { id: 'o1', side: 'opponent', title: { pt: "Manifesto pela Reserva Agrícola Nacional (Quercus, ZERO, LPN)", en: "Manifesto for the National Agricultural Reserve (Quercus, ZERO, LPN)" }, summary: { pt: "Declaração conjunta de grandes ONGs nacionais exigindo a preservação rigorosa da RAN e rejeitando o modelo expansionista em favor da regeneração urbana sustentável.", en: "Joint statement from major national NGOs demanding strict RAN preservation and rejecting the expansionist model in favor of sustainable urban regeneration." }, link: "https://www.google.com/search?q=Manifesto+Reserva+Agrícola+Nacional+Oeiras+ZERO+Quercus" },
+            { id: 'o2', side: 'opponent', title: { pt: "Evoluir Oeiras: O Paradoxo dos 7.000 Imóveis Devolutos", en: "Evoluir Oeiras: The Paradox of 7,000 Vacant Properties" }, summary: { pt: "Alegação ativista local que desafia a premissa central da CMO citando mais de 7.000 imóveis devolutos, argumentando que a crise pode ser resolvida através da reabilitação.", en: "Local activist claim challenging the CMO's core premise by citing an estimated 7,000+ vacant properties, arguing the crisis can be solved through rehabilitation." }, link: "https://www.google.com/search?q=Evoluir+Oeiras+7000+Imóveis+Devolutos" },
+            { id: 'o3', side: 'opponent', title: { pt: "Parecer CNADS sobre Risco de Desregulação no Planeamento Urbano", en: "CNADS Opinion on Risk of Urban Planning Deregulation" }, summary: { pt: "Parecer de organismos nacionais de planeamento contestando a premissa da CMO, alertando para o perigoso precedente político de 'desregulamentação'.", en: "National planning advisory body opinion opposing the municipal move, warning of the dangerous political precedent of 'deregulation' set by overriding RAN status." }, link: "https://www.google.com/search?q=CNADS+Parecer+Risco+de+Desregulação+Oeiras" },
+            { id: 'o4', side: 'opponent', title: { pt: "Análise Ecológica: RAN Solo Classe A/B e Imunidade Legal", en: "Ecological Analysis: RAN Class A/B Soil and Legal Immunity" }, summary: { pt: "Análise especializada confirmando que o terreno em questão é solo agrícola de alta aptidão, o que, sob a lei existente, deve conferir o mais alto nível de imunidade legal contra a construção.", en: "Expert analysis confirming that the land in question is highly-aptitude agricultural soil, which, under existing law, should confer the highest level of non-negotiable legal immunity against construction." }, link: "https://www.google.com/search?q=Análise+Ecológica+RAN+Solo+Classe+A%2FB+Oeiras" },
+            { id: 'o5', side: 'opponent', title: { pt: "Estudo de Impacto Climático e Perda de Sumidouros de Carbono", en: "Climate Impact Study and Loss of Carbon Sinks" }, summary: { pt: "Investigação alertando que a perda permanente de espaços verdes e solo fértil compromete significativamente a adaptação climática de longo prazo de Oeiras e a capacidade de absorção de carbono.", en: "Research warning that the permanent loss of green spaces and fertile soil significantly compromises Oeiras's long-term climate adaptation and carbon absorption capacity." }, link: "https://www.google.com/search?q=Estudo+de+Impacto+Climático+e+Perda+de+Sumidouros+de+Carbono+Oeiras" },
+            { id: 'o6', side: 'opponent', title: { pt: "Reportagem: Pressão Imobiliária e o Destino dos Terrenos Rústicos", en: "Report: Real Estate Pressure and the Fate of Rustic Land" }, summary: { pt: "Jornalismo de investigação destacando a crescente pressão financeira e política exercida pelo setor imobiliário para desclassificar terrenos protegidos perto de centros urbanos.", en: "Investigative journalism highlighting the increasing financial and political pressure exerted by the real estate sector to declassify protected land near urban centers." }, link: "https://www.google.com/search?q=Pressão+Imobiliária+e+o+Destino+dos+Terrenos+Rústicos+Oeiras" },
         ];
 
 
@@ -665,28 +660,38 @@
             oppContainer.innerHTML = '';
             propContainer.innerHTML = '';
 
-            const teamCardOpp = `<div class="p-4 rounded-lg shadow-inner mt-6" style="background-color: var(--color-opponent); opacity: 0.1;">
-                                <p class="font-bold text-sm" style="color: var(--color-opponent);" >${lang === 'pt' ? 'Analistas do Projeto (Foco Oponente)' : 'Project Analysts (Opponent Side Focus)'}</p>
-                                <p class="text-xs text-gray-700">${lang === 'pt' ? '<strong>Daniel</strong> (Entrevistas) e <strong>Philina</strong> (Coordenação de Campo) mapeiam a resistência e o enquadramento ecológico.' : '<strong>Daniel</strong> (Stakeholder/Interview Lead) and <strong>Philina</strong> (Field Coordination) map the grassroots resistance and ecological framing.'}</p>
-                            </div>`;
-            const teamCardProp = `<div class="p-4 rounded-lg shadow-inner mt-6" style="background-color: var(--color-proponent); opacity: 0.1;">
-                                <p class="font-bold text-sm" style="color: var(--color-proponent);">${lang === 'pt' ? 'Analistas do Projeto (Foco Proponente)' : 'Project Analysts (Proponent Side Focus)'}</p>
-                                <p class="text-xs text-gray-700">${lang === 'pt' ? '<strong>Juliana</strong> (Finanças), <strong>Teresa</strong> (Gestão) e <strong>Reza</strong> (Design de Investigação) analisam a mentalidade administrativa/económica.' : '<strong>Juliana</strong> (Finance/Operations), <strong>Teresa</strong> (Project Management), and <strong>Reza</strong> (Research Design) analyze the administrative/economic mindset.'}</p>
-                            </div>`;
+            // REMOVE: Eliminated the Analyst team cards as requested
+            // const teamCardOpp = `...`;
+            // const teamCardProp = `...`;
             
-            const colorOpponent = 'var(--color-opponent)';
-            const colorProponent = 'var(--color-proponent)';
+            const colorOpponent = getComputedStyle(document.documentElement).getPropertyValue('--color-opponent').trim();
+            const colorProponent = getComputedStyle(document.documentElement).getPropertyValue('--color-proponent').trim();
             const colorObject = '#10B981'; // Green for RAN
             const colorPivot = '#FBBF24'; // Yellow for Applicants
+            const colorMain = getComputedStyle(document.documentElement).getPropertyValue('--color-main').trim();
+            const colorNeutral = getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-accent').trim();
 
             Object.entries(translations.actorData).forEach(([key, data]) => {
                 let color;
                 let hoverBg;
-                if (data.type === 'opponent') { color = colorOpponent; hoverBg = 'rgba(229, 79, 109, 0.1)'; } 
-                else if (data.type === 'proponent') { color = colorProponent; hoverBg = 'rgba(72, 172, 240, 0.1)'; }
-                else if (data.type === 'object') { color = colorObject; hoverBg = 'rgba(16, 185, 129, 0.1)'; } 
-                else if (data.type === 'pivot') { color = colorPivot; hoverBg = 'rgba(251, 191, 36, 0.1)'; }
-                else { color = '#4B5563'; hoverBg = 'rgba(75, 85, 99, 0.1)'; } // Neutral gray
+
+                if (data.type === 'opponent') { 
+                    color = colorOpponent; 
+                    hoverBg = 'rgba(229, 79, 109, 0.1)'; 
+                }
+                else if (data.type === 'proponent') { 
+                    color = colorProponent; 
+                    hoverBg = 'rgba(72, 172, 240, 0.1)'; 
+                }
+                // FIX: Use main color for RAN/Pivot border and text
+                else if (data.type === 'object' || data.type === 'pivot') { 
+                    color = colorMain; 
+                    hoverBg = 'rgba(108, 70, 117, 0.1)'; 
+                } 
+                else { 
+                    color = colorNeutral; 
+                    hoverBg = 'rgba(43, 48, 58, 0.1)'; 
+                } 
 
                 const cardHtml = `
                     <div data-actor="${key}" class="debate-card actor-cell bg-white p-4 rounded-lg shadow-md border-l-4" style="border-left-color: ${color}; --tw-bg-opacity: 1; transition: background-color 0.3s ease-in-out;" 
@@ -703,8 +708,9 @@
                 }
             });
             
-            oppContainer.innerHTML += teamCardOpp;
-            propContainer.innerHTML += teamCardProp;
+            // REMOVE: Eliminated the Analyst team cards as requested
+            // oppContainer.innerHTML += teamCardOpp;
+            // propContainer.innerHTML += teamCardProp;
 
             // Re-attach event listeners after re-rendering
             document.querySelectorAll('.debate-card').forEach(node => {
@@ -725,12 +731,17 @@
             const oppTimeline = document.getElementById('opp-timeline');
             const propTimeline = document.getElementById('prop-timeline');
 
-            // FIX: Added null check for translations.timelineOpponent (was previously undefined)
+            // --- Opponent Timeline ---
             if (translations.timelineOpponent) {
                 oppTimeline.innerHTML = translations.timelineOpponent.map((step, index) => `
-                    <div id="opp-step-${index + 1}" class="resistance-step fade-in-on-scroll translate-x-12">
-                        <div class="number-circle">${index + 1}</div>
-                        <div class="content">
+                    <!-- FIX: Standardized structure for visual symmetry with Proponent side -->
+                    <div id="opp-step-${index + 1}" class="flex items-start mb-8 relative fade-in-on-scroll translate-x-12">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 -ml-4" 
+                             style="background-color: var(--color-opponent); box-shadow: 0 0 0 4px var(--color-opponent)40;">
+                            ${index + 1}
+                        </div>
+                        <!-- FIX: Applied bg-white, padding, shadow for consistent content block background -->
+                        <div class="ml-8 bg-white p-5 rounded-lg shadow-md flex-grow">
                             <h5 class="font-bold text-lg text-[var(--color-text)]">${step.title[lang]}</h5>
                             <p class="text-gray-600 text-sm">${step.desc[lang]}</p>
                         </div>
@@ -738,10 +749,10 @@
                 `).join('');
             }
 
-            // FIX: Added null check for translations.timelineProponent (was previously undefined)
+            // --- Proponent Timeline ---
             if (translations.timelineProponent) {
                 propTimeline.innerHTML = translations.timelineProponent.map((step, index) => `
-                    <div id="step-${index + 1}" class="flex fade-in-on-scroll translate-x-12">
+                    <div id="step-${index + 1}" class="flex items-start mb-8 relative fade-in-on-scroll translate-x-12">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 -ml-4" style="background-color: var(--color-proponent);">${index + 1}</div>
                         <div class="ml-8 bg-white p-5 rounded-lg shadow-md flex-grow">
                             <h5 class="font-bold text-lg text-[var(--color-text)]">${step.title[lang]}</h5>
@@ -784,6 +795,7 @@
         const showProponentButton = document.getElementById('show-proponent-evidence');
 
         function renderEvidence(lang, side) {
+            // Updated to use the specific Google Search links
             const filteredSources = researchSources.filter(source => source.side === side);
             
             evidenceContainer.innerHTML = filteredSources.map(source => `
@@ -802,22 +814,24 @@
             const colorText = getComputedStyle(document.documentElement).getPropertyValue('--color-text');
             const colorNeutral = getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-accent');
 
-            if (side === 'opponent') {
-                showOpponentButton.style.backgroundColor = colorOpponent;
-                showOpponentButton.style.color = 'white';
-                showOpponentButton.style.border = 'none';
+            if (showOpponentButton && showProponentButton) {
+                if (side === 'opponent') {
+                    showOpponentButton.style.backgroundColor = colorOpponent;
+                    showOpponentButton.style.color = 'white';
+                    showOpponentButton.style.border = 'none';
 
-                showProponentButton.style.backgroundColor = 'white';
-                showProponentButton.style.color = colorText;
-                showProponentButton.style.border = '1px solid ' + colorNeutral;
-            } else {
-                showProponentButton.style.backgroundColor = colorProponent;
-                showProponentButton.style.color = 'white';
-                showProponentButton.style.border = 'none';
+                    showProponentButton.style.backgroundColor = 'white';
+                    showProponentButton.style.color = colorText;
+                    showProponentButton.style.border = '1px solid ' + colorNeutral;
+                } else {
+                    showProponentButton.style.backgroundColor = colorProponent;
+                    showProponentButton.style.color = 'white';
+                    showProponentButton.style.border = 'none';
 
-                showOpponentButton.style.backgroundColor = 'white';
-                showOpponentButton.style.color = colorText;
-                showOpponentButton.style.border = '1px solid ' + colorNeutral;
+                    showOpponentButton.style.backgroundColor = 'white';
+                    showOpponentButton.style.color = colorText;
+                    showOpponentButton.style.border = '1px solid ' + colorNeutral;
+                }
             }
             currentEvidenceSide = side;
         }
@@ -837,40 +851,42 @@
             const colorText = getComputedStyle(document.documentElement).getPropertyValue('--color-text');
             const colorNeutral = getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-accent');
 
-            vacantDisplay.innerHTML = `
-                <div class="fade-in">
-                    <p class="text-6xl font-extrabold" style="color: ${color};">${data.number}</p>
-                    <p class="text-gray-500 font-medium mb-4">${currentLang === 'pt' ? 'Alegação de Capacidade Devoluta/Reutilizável' : 'Vacant/Reusable Capacity Claim'}</p>
-                    <p class="text-base text-gray-700 max-w-sm mx-auto">${currentLang === 'pt' ? 'Argumento da Fonte' : 'Source Argument'}: <strong>${data.source[currentLang]}</strong></p>
-                </div>
-            `;
-             if (source === 'coalition') {
+            if (vacantDisplay) {
+                vacantDisplay.innerHTML = `
+                    <div class="fade-in">
+                        <p class="text-6xl font-extrabold" style="color: ${color};">${data.number}</p>
+                        <p class="text-gray-500 font-medium mb-4">${currentLang === 'pt' ? 'Alegação de Capacidade Devoluta/Reutilizável' : 'Vacant/Reusable Capacity Claim'}</p>
+                        <p class="text-base text-gray-700 max-w-sm mx-auto">${currentLang === 'pt' ? 'Argumento da Fonte' : 'Source Argument'}: <strong>${data.source[currentLang]}</strong></p>
+                    </div>
+                `;
+            }
+             
+            if (toggleCoalition && toggleCMOClaim) {
                 toggleCoalition.textContent = currentLang === 'pt' ? 'Alegação da Coligação (7.000)' : 'Coalition\'s Claim (7,000)';
                 toggleCMOClaim.textContent = currentLang === 'pt' ? 'Alegação da CMO (Esgotado)' : 'CMO\'s Claim (Exhausted)';
 
-                toggleCoalition.style.backgroundColor = 'var(--color-opponent)';
-                toggleCoalition.style.color = 'white';
-                toggleCoalition.style.borderColor = 'var(--color-opponent)';
+                if (source === 'coalition') {
+                    toggleCoalition.style.backgroundColor = 'var(--color-opponent)';
+                    toggleCoalition.style.color = 'white';
+                    toggleCoalition.style.borderColor = 'var(--color-opponent)';
 
-                toggleCMOClaim.style.backgroundColor = 'white';
-                toggleCMOClaim.style.color = colorText;
-                toggleCMOClaim.style.borderColor = colorNeutral;
-            } else {
-                toggleCoalition.textContent = currentLang === 'pt' ? 'Alegação da Coligação (7.000)' : 'Coalition\'s Claim (7,000)';
-                toggleCMOClaim.textContent = currentLang === 'pt' ? 'Alegação da CMO (Esgotado)' : 'CMO\'s Claim (Exhausted)';
+                    toggleCMOClaim.style.backgroundColor = 'white';
+                    toggleCMOClaim.style.color = colorText;
+                    toggleCMOClaim.style.borderColor = colorNeutral;
+                } else {
+                    toggleCMOClaim.style.backgroundColor = 'var(--color-proponent)';
+                    toggleCMOClaim.style.color = 'white';
+                    toggleCMOClaim.style.borderColor = 'var(--color-proponent)';
 
-                toggleCMOClaim.style.backgroundColor = 'var(--color-proponent)';
-                toggleCMOClaim.style.color = 'white';
-                toggleCMOClaim.style.borderColor = 'var(--color-proponent)';
-
-                toggleCoalition.style.backgroundColor = 'white';
-                toggleCoalition.style.color = colorText;
-                toggleCoalition.style.borderColor = colorNeutral;
+                    toggleCoalition.style.backgroundColor = 'white';
+                    toggleCoalition.style.color = colorText;
+                    toggleCoalition.style.borderColor = colorNeutral;
+                }
             }
         }
         
-        toggleCoalition.addEventListener('click', () => updateVacantDisplay('coalition'));
-        toggleCMOClaim.addEventListener('click', () => updateVacantDisplay('cmo'));
+        if (toggleCoalition) toggleCoalition.addEventListener('click', () => updateVacantDisplay('coalition'));
+        if (toggleCMOClaim) toggleCMOClaim.addEventListener('click', () => updateVacantDisplay('cmo'));
 
 
         // --- CHART.JS SETUP & TRANSLATION ---
@@ -1042,17 +1058,24 @@
         function createStakeholderBubbleChart(lang) {
             if (bubbleChart) bubbleChart.destroy();
             const ctx = document.getElementById('stakeholderBubbleChart').getContext('2d');
+            const styles = getComputedStyle(document.documentElement);
+            const colorProponent = styles.getPropertyValue('--color-proponent').trim();
+            const colorOpponent = styles.getPropertyValue('--color-opponent').trim();
+            const colorMain = styles.getPropertyValue('--color-main').trim();
+            const colorText = styles.getPropertyValue('--color-text').trim();
+            const colorNeutral = styles.getPropertyValue('--color-neutral-accent').trim();
+
             const stakeholderData = {
                 datasets: [{
-                    label: lang === 'pt' ? 'Município de Oeiras (CMO)' : 'Oeiras Municipality (CMO)', data: [{ x: 9, y: 9, r: 25 }], backgroundColor: 'var(--color-proponent)'
+                    label: lang === 'pt' ? 'Município de Oeiras (CMO)' : 'Oeiras Municipality (CMO)', data: [{ x: 9, y: 9, r: 25 }], backgroundColor: colorProponent
                 }, {
-                    label: lang === 'pt' ? 'Coligação Ambiental (Evoluir Oeiras)' : 'Environmental Coalition (Evoluir Oeiras)', data: [{ x: 8, y: 4, r: 15 }], backgroundColor: 'var(--color-opponent)'
+                    label: lang === 'pt' ? 'Coligação Ambiental (Evoluir Oeiras)' : 'Environmental Coalition (Evoluir Oeiras)', data: [{ x: 8, y: 4, r: 15 }], backgroundColor: colorOpponent
                 }, {
-                    label: lang === 'pt' ? 'Famílias em Lista de Espera' : 'Families on Waitlists', data: [{ x: 10, y: 2, r: 10 }], backgroundColor: '#FBBF24'
+                    label: lang === 'pt' ? 'Famílias em Lista de Espera' : 'Families on Waitlists', data: [{ x: 10, y: 2, r: 10 }], backgroundColor: colorMain
                 }, {
-                    label: lang === 'pt' ? 'Promotores Imobiliários' : 'Real Estate Developers', data: [{ x: 7, y: 7, r: 20 }], backgroundColor: '#34D399'
+                    label: lang === 'pt' ? 'Promotores Imobiliários' : 'Real Estate Developers', data: [{ x: 7, y: 7, r: 20 }], backgroundColor: colorText
                 }, {
-                    label: lang === 'pt' ? 'Associações de Agricultores' : 'Farmers Associations', data: [{ x: 6, y: 5, r: 12 }], backgroundColor: 'rgba(100, 100, 100, 0.7)'
+                    label: lang === 'pt' ? 'Associações de Agricultores' : 'Farmers Associations', data: [{ x: 6, y: 5, r: 12 }], backgroundColor: colorNeutral || '#a0a0a0'
                 }]
             };
 
@@ -1133,28 +1156,30 @@
              sections.forEach(section => chapterObserver.observe(section));
 
              // 2. Fade-In on Scroll 
-             const timelineObserver = new IntersectionObserver((entries) => {
+             // We unobserve elements after they become visible to prevent redundant checks
+             const fadeObserver = new IntersectionObserver((entries) => {
                  entries.forEach(entry => {
                      if (entry.isIntersecting) {
                          entry.target.classList.add('is-visible');
+                         fadeObserver.unobserve(entry.target);
                      }
                  });
              }, { rootMargin: '0px', threshold: 0.1 }); 
 
-             fadeElements.forEach(el => timelineObserver.observe(el));
+             fadeElements.forEach(el => fadeObserver.observe(el));
         }
         
         // --- EVENT LISTENERS FOR EVIDENCE ---
-        showOpponentButton.addEventListener('click', () => renderEvidence(currentLang, 'opponent'));
-        showProponentButton.addEventListener('click', () => renderEvidence(currentLang, 'proponent'));
+        if (showOpponentButton) showOpponentButton.addEventListener('click', () => renderEvidence(currentLang, 'opponent'));
+        if (showProponentButton) showProponentButton.addEventListener('click', () => renderEvidence(currentLang, 'proponent'));
 
         // --- INITIALIZATION ---
         function init() {
             // Set up language switch buttons
-            // These calls now target elements added back into the DOM via the scrollable header div.
             const togglePt = document.getElementById('lang-toggle-pt');
             const toggleEn = document.getElementById('lang-toggle-en');
             
+            // FIX: Added DOM existence check for safety against null errors
             if (togglePt) { togglePt.addEventListener('click', () => updateLanguage('pt')); }
             if (toggleEn) { toggleEn.addEventListener('click', () => updateLanguage('en')); }
 
